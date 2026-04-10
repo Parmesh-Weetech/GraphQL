@@ -5,7 +5,7 @@ import { addOrder, findAllOrders, findOrderById } from "./order.service.ts";
 export const orderResolvers = {
     Query: {
         orders: async (_parent: undefined, args: { userId: string }) => findAllOrders(args.userId),
-        order: async (_parent: undefined, args: { id: string; userId: string }) => findOrderById(args.id),
+        order: async (_parent: undefined, args: { id: string }) => findOrderById(args.id),
     },
     Mutation: {
         placeOrder: async (_parent: undefined, args: { userId: string }) => {

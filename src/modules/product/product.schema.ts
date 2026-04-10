@@ -12,5 +12,6 @@ export const productTypeDefs = `#graphql
 
     type Mutation {
         addProduct(name: String!, price: Float!): Product!
+        removeProduct(id: ID!): Boolean!
     }
 `;

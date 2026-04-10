@@ -1,5 +1,5 @@
 import pool from "../../config/db.ts";
-import type { Order, OrderItem, OrderItemRow } from "./types/order.type.ts";
+import type { Order, OrderItemRow } from "./types/order.type.ts";
 
 export const findOrderById = async (id: string): Promise<Order | null> => {
     const result = await pool.query<any>(

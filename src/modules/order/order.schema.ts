@@ -15,7 +15,7 @@ export const orderTypeDefs = `#graphql
 
     type Query {
         orders(userId: ID!): [Order!]!
-        order(id: ID!, userId: ID!): Order
+        order(id: ID!): Order
     }
 
     type Mutation {

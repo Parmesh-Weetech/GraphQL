@@ -8,6 +8,7 @@ export const userTypeDefs = `#graphql
     }
 
     type Query {
+        users: [User!]!
         user(userId: ID!): User
     }
 

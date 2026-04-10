@@ -1,19 +1,31 @@
+import express from 'express';
 import { ApolloServer } from "@apollo/server";
-import { startStandaloneServer } from "@apollo/server/standalone";
+import { expressMiddleware } from "@as-integrations/express5";
 import { resolvers } from "./graphql/resolvers.ts";
 import { typeDefs } from "./graphql/typeDefs.ts";
+import cors from 'cors';
 import "dotenv/config";
 
 const PORT = process.env.PORT || 4000;
+
+const app = express();
 
 const server = new ApolloServer({
     typeDefs,
     resolvers
 });
 
-const { url } = await startStandaloneServer(server, {
-    listen: { port: Number(PORT) },
-    context: async () => ({})
-});
+await server.start();
 
-console.log(`Server is running on ${url}`);
+app.use(
+    '/graphql',
+    cors<cors.CorsRequest>(),
+    express.json(),
+    expressMiddleware(server, {
+        context: async ({ req }) => ({})
+    })
+);
+
+app.listen(PORT, () => {
+    console.log(`Server is running on http://localhost:${PORT}/graphql`);
+});
