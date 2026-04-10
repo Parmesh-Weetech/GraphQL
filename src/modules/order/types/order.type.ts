@@ -1,19 +1,27 @@
-import type { CartItem } from "../../cart/types/cart.item.ts";
+import type { ProductRow } from "../../product/types/product.type.ts"
 
-export type OrderRow = {
+export type Order = {
     id: string
     total: number
+    userId: string
+    status: string
+    items: OrderItemRow[]
 }
 
 export type OrderItemRow = {
     id: string;
-    order_id: string;
-    product_id: string;
+    orderId: string;
+    productId: string;
     quantity: number;
+    price: number;
+    totalPrice: number;
 };
 
 export type OrderItem = {
     id: string;
-    cart: CartItem;
-    order: OrderRow;
-};
+    orderId: string;
+    product: ProductRow;
+    quantity: number;
+    price: number;
+    totalPrice: number;
+}

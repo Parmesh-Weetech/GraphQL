@@ -19,6 +19,6 @@ export const orderTypeDefs = `#graphql
     }
 
     type Mutation {
-        placeOrder(cartId: ID!): Order!
+        placeOrder(userId: ID!): Order!
     }
 `;

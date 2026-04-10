@@ -1,43 +1,40 @@
-import { addCartItem, clearCartItems, findAllCartItems, findCartItemById } from "../modules/cart/cart-item.service.ts";
-import {
-    addOrderItem,
-    findAllOrderItems,
-    findOrderItemById
-} from "../modules/order/order-item.service.ts";
-import { addOrder, findAllOrders, findOrderById } from "../modules/order/order.service.ts";
-import { addProduct, findAllProducts, findProductById } from "../modules/product/product.service.ts";
+import { cartResolvers } from "../modules/cart/cart.resolver.ts";
+import { orderResolvers } from "../modules/order/order.resolver.ts";
+import { productResolvers } from "../modules/product/product.resolver.ts";
+import { userResolvers } from "../modules/user/user.resolver.ts";
+import { findAllOrderItems } from "../modules/order/order-item.service.ts";
+import { findUserById } from "../modules/user/user.service.ts";
 
 export const resolvers = {
     Query: {
-        products: async () => findAllProducts(),
-        product: async (_parent: undefined, args: { id: string }) => findProductById(args.id),
-        cartItems: async () => findAllCartItems(),
-        cartItem: async (_parent: undefined, args: { id: string }) => findCartItemById(args.id),
-        orders: async () => findAllOrders(),
-        order: async (_parent: undefined, args: { id: string }) => findOrderById(args.id),
-        orderItems: async () => findAllOrderItems(),
-        orderItem: async (_parent: undefined, args: { id: string }) => findOrderItemById(args.id)
+        ...orderResolvers.Query,
+        ...cartResolvers.Query,
+        ...productResolvers.Query,
+        ...userResolvers.Query
     },
     Mutation: {
-        addProduct: async (_parent: undefined, args: { name: string; price: number }) =>
-            addProduct(args.name, args.price),
-        addToCart: async (_parent: undefined, args: { productId: string; quantity: number }) =>
-            addCartItem(args.productId, args.quantity),
-        placeOrder: async () => {
-            const cartItems = await findAllCartItems();
-
-            const total = cartItems.reduce((sum, cartItem) => {
-                return sum + cartItem.product.price * cartItem.quantity;
-            }, 0);
-
-            const order = await addOrder(total);
-
-            for (const cartItem of cartItems) {
-                await addOrderItem(order.id, cartItem.product.id, cartItem.quantity);
+        ...orderResolvers.Mutation,
+        ...cartResolvers.Mutation,
+        ...productResolvers.Mutation,
+        ...userResolvers.Mutation
+    },
+    CartItem: {
+        user: async (parent: { userId: string }) => findUserById(parent.userId)
+    },
+    Order: {
+        user: async (parent: { userId: string }) => findUserById(parent.userId),
+        items: async (parent: { id: string }) => {
+            const allItems = await findAllOrderItems();
+            return allItems.filter((item: any) => item.orderId === parent.id);
+        }
+    },
+    OrderItem: {
+        product: async (parent: { productId: string }, _args: any, { loaders }: any) => {
+            if (loaders?.product) {
+                return loaders.product.load(parent.productId);
             }
-
-            await clearCartItems();
-            return order;
+            const { findProductById } = await import("../modules/product/product.service.ts");
+            return findProductById(parent.productId);
         }
     }
 };

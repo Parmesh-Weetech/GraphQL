@@ -46,3 +46,12 @@ export const addProduct = async (name: string, price: number) => {
         price: Number(product.price)
     };
 };
+
+export const removeProduct = async (id: string) => {
+    const result = await pool.query<ProductRow>(
+        "DELETE FROM products WHERE id = $1",
+        [id]
+    );
+
+    return result.rowCount > 0;
+}

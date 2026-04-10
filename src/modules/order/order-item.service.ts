@@ -5,8 +5,8 @@ import { findProductById } from "../product/product.service.ts";
 
 const mapOrderItem = async (row: OrderItemRow): Promise<OrderItem | null> => {
     const [order, product] = await Promise.all([
-        findOrderById(row.order_id),
-        findProductById(row.product_id)
+        findOrderById(row.orderId),
+        findProductById(row.productId)
     ]);
 
     if (!order || !product) {
@@ -15,22 +15,17 @@ const mapOrderItem = async (row: OrderItemRow): Promise<OrderItem | null> => {
 
     return {
         id: row.id,
-        cart: {
-            id: row.id,
-            product: {
-                id: product.id,
-                name: product.name,
-                price: Number(product.price)
-            },
-            quantity: row.quantity
-        },
-        order
+        orderId: row.orderId,
+        product,
+        quantity: row.quantity,
+        price: row.price,
+        totalPrice: row.totalPrice
     };
 };
 
 export const findOrderItemById = async (id: string) => {
     const result = await pool.query<OrderItemRow>(
-        "SELECT id, order_id, product_id, quantity FROM order_items WHERE id = $1 LIMIT 1",
+        "SELECT id, orderId, productId, quantity, price, totalPrice FROM order_items WHERE id = $1 LIMIT 1",
         [id]
     );
 
@@ -45,7 +40,7 @@ export const findOrderItemById = async (id: string) => {
 
 export const findAllOrderItems = async () => {
     const result = await pool.query<OrderItemRow>(
-        "SELECT id, order_id, product_id, quantity FROM order_items"
+        "SELECT id, orderId, productId, quantity, price, totalPrice FROM order_items"
     );
     const items: OrderItem[] = [];
 
@@ -59,10 +54,10 @@ export const findAllOrderItems = async () => {
     return items;
 };
 
-export const addOrderItem = async (orderId: string, productId: string, quantity: number) => {
+export const addOrderItem = async (orderId: string, productId: string, quantity: number, price: number) => {
     const result = await pool.query<OrderItemRow>(
-        "INSERT INTO order_items (order_id, product_id, quantity) VALUES ($1, $2, $3) RETURNING id, order_id, product_id, quantity",
-        [orderId, productId, quantity]
+        "INSERT INTO order_items (orderId, productId, quantity, price, totalPrice) VALUES ($1, $2, $3, $4, $5) RETURNING id, orderId, productId, quantity, price, totalPrice",
+        [orderId, productId, quantity, price, price * quantity]
     );
 
     return mapOrderItem(result.rows[0]);
