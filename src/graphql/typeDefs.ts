@@ -1,7 +1,7 @@
-import { cartTypeDefs } from "../modules/cart/cart.schema.ts";
-import { orderTypeDefs } from "../modules/order/order.schema.ts";
-import { productTypeDefs } from "../modules/product/product.schema.ts";
-import { userTypeDefs } from "../modules/user/user.schema.ts";
+import { userTypeDefs } from "./user/index.ts";
+import { productTypeDefs } from "./product/index.ts";
+import { cartTypeDefs } from "./cart/index.ts";
+import { orderTypeDefs } from "./order/index.ts";
 
 export const typeDefs = [
     userTypeDefs,

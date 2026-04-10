@@ -2,7 +2,7 @@ import pool from "../../config/db.ts";
 
 export const addUser = async (name: string, email: string) => {
     const existingUser = await pool.query(
-        "SELECT id FROM users WHERE email = $1",
+        'SELECT id FROM users WHERE email = $1',
         [email]
     );
 
@@ -11,19 +11,19 @@ export const addUser = async (name: string, email: string) => {
     }
 
     const { rows } = await pool.query(
-        "INSERT INTO users (name, email) VALUES ($1, $2) RETURNING *",
+        'INSERT INTO users (name, email) VALUES ($1, $2) RETURNING *',
         [name, email]
     );
     return rows[0];
 }
 
 export const findAllUsers = async () => {
-    const { rows } = await pool.query("SELECT * FROM users");
+    const { rows } = await pool.query('SELECT * FROM users');
     return rows;
 }
 
 export const findUserById = async (id: string) => {
-    const { rows } = await pool.query("SELECT * FROM users WHERE id = $1", [id]);
+    const { rows } = await pool.query('SELECT * FROM users WHERE id = $1', [id]);
     return rows[0];
 }
 

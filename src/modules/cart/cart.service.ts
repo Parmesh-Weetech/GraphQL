@@ -17,13 +17,13 @@ const mapCartItem = (row: CartItemRow, product: ProductRow): CartItem => {
             price: Number(product.price),
         },
         price: row.price,
-        userId: row.userId
+        "userId": row.userId
     }
 };
 
 export const findCartItemById = async (id: string) => {
     const result = await pool.query<CartItemRow>(
-        "SELECT id, productId, price, quantity, userId, totalPrice FROM cart_items WHERE id = $1 LIMIT 1",
+        'SELECT id, "productId", price, quantity, "userId", "totalPrice" FROM cart_items WHERE id = $1 LIMIT 1',
         [id]
     );
 
@@ -38,7 +38,7 @@ export const findCartItemById = async (id: string) => {
 };
 
 export const findAllCartItems = async (userId: string): Promise<CartItem[]> => {
-    const result = await pool.query<CartItemRow>("SELECT id, productId, quantity, price, userId, totalPrice FROM cart_items WHERE userId = $1", [userId]);
+    const result = await pool.query<CartItemRow>('SELECT id, "productId", quantity, price, "userId", "totalPrice" FROM cart_items WHERE "userId" = $1', [userId]);
 
     const items: CartItem[] = [];
 
@@ -60,7 +60,7 @@ export const addCartItem = async (productId: string, quantity: number, userId: s
     }
 
     const result = await pool.query<CartItemRow>(
-        "INSERT INTO cart_items (productId, quantity, price, userId, totalPrice) VALUES ($1, $2, $3, $4, $5) RETURNING id, productId, quantity, price, userId",
+        'INSERT INTO cart_items ("productId", quantity, price, "userId", "totalPrice") VALUES ($1, $2, $3, $4, $5) RETURNING id, "productId", quantity, price, "userId"',
         [productId, quantity, product.price, userId, product.price * quantity]
     );
 
@@ -72,5 +72,5 @@ export const removeCartItem = async (id: string) => {
 }
 
 export const clearCartItems = async (userId: string) => {
-    await pool.query("DELETE FROM cart_items WHERE userId = $1", [userId]);
+    await pool.query('DELETE FROM cart_items WHERE "userId" = $1', [userId]);
 };

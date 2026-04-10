@@ -3,7 +3,7 @@ import type { ProductRow } from "./types/product.type.ts";
 
 export const findProductById: (id: string) => Promise<ProductRow | null> = async (id: string) => {
     const result = await pool.query<ProductRow>(
-        "SELECT id, name, price FROM products WHERE id = $1 LIMIT 1",
+        'SELECT id, name, price FROM products WHERE id = $1 LIMIT 1',
         [id]
     );
 
@@ -22,7 +22,7 @@ export const findProductById: (id: string) => Promise<ProductRow | null> = async
 
 export const findAllProducts: () => Promise<ProductRow[]> = async () => {
     const result = await pool.query<ProductRow>(
-        "SELECT id, name, price FROM products"
+        'SELECT id, name, price FROM products'
     );
 
     return result.rows.map(product => ({
@@ -34,7 +34,7 @@ export const findAllProducts: () => Promise<ProductRow[]> = async () => {
 
 export const addProduct = async (name: string, price: number) => {
     const result = await pool.query<ProductRow>(
-        "INSERT INTO products (name, price) VALUES ($1, $2) RETURNING id, name, price",
+        'INSERT INTO products (name, price) VALUES ($1, $2) RETURNING id, name, price',
         [name, price]
     );
 
@@ -49,7 +49,7 @@ export const addProduct = async (name: string, price: number) => {
 
 export const removeProduct = async (id: string) => {
     const result = await pool.query<ProductRow>(
-        "DELETE FROM products WHERE id = $1",
+        'DELETE FROM products WHERE id = $1',
         [id]
     );
 

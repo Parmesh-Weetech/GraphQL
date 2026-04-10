@@ -3,8 +3,6 @@ export const userTypeDefs = `#graphql
         id: ID!
         name: String!
         email: String!
-        cart: Cart!
-        orders: [Order]!
     }
 
     type Query {

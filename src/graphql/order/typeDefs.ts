@@ -3,14 +3,13 @@ export const orderTypeDefs = `#graphql
         id: ID!
         product: Product!
         quantity: Int!
-        price: Float! # The price at the time of order
+        price: Float!
     }
 
     type Order {
         id: ID!
         total: Float!
         items: [OrderItem!]!
-        user: User!
     }
 
     type Query {

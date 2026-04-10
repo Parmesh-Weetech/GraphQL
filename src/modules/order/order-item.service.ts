@@ -25,7 +25,7 @@ const mapOrderItem = async (row: OrderItemRow): Promise<OrderItem | null> => {
 
 export const findOrderItemById = async (id: string) => {
     const result = await pool.query<OrderItemRow>(
-        "SELECT id, orderId, productId, quantity, price, totalPrice FROM order_items WHERE id = $1 LIMIT 1",
+        'SELECT id, "orderId", "productId", quantity, price, "totalPrice" FROM order_items WHERE id = $1 LIMIT 1',
         [id]
     );
 
@@ -40,7 +40,7 @@ export const findOrderItemById = async (id: string) => {
 
 export const findAllOrderItems = async () => {
     const result = await pool.query<OrderItemRow>(
-        "SELECT id, orderId, productId, quantity, price, totalPrice FROM order_items"
+        'SELECT id, "orderId", "productId", quantity, price, "totalPrice" FROM order_items'
     );
     const items: OrderItem[] = [];
 
@@ -56,7 +56,7 @@ export const findAllOrderItems = async () => {
 
 export const addOrderItem = async (orderId: string, productId: string, quantity: number, price: number) => {
     const result = await pool.query<OrderItemRow>(
-        "INSERT INTO order_items (orderId, productId, quantity, price, totalPrice) VALUES ($1, $2, $3, $4, $5) RETURNING id, orderId, productId, quantity, price, totalPrice",
+        'INSERT INTO order_items ("orderId", "productId", quantity, price, "totalPrice") VALUES ($1, $2, $3, $4, $5) RETURNING id, "orderId", "productId", quantity, price, "totalPrice"',
         [orderId, productId, quantity, price, price * quantity]
     );
 

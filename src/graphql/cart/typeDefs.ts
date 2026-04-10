@@ -3,12 +3,10 @@ export const cartTypeDefs = `#graphql
         id: ID!
         product: Product!
         quantity: Int!
-        user: User!
     }
 
     type Cart {
         items: [CartItem!]!
-        user: User!
     }
 
     type Query {
