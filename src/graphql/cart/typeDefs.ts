@@ -10,14 +10,14 @@ export const cartTypeDefs = `#graphql
     }
 
     type Query {
-        cart(userId: ID!): Cart
-        cartItems(userId: ID!): [CartItem!]!
+        cart: Cart
+        cartItems: [CartItem!]!
         cartItem(id: ID!): CartItem
     }
 
     type Mutation {
-        addToCart(productId: ID!, quantity: Int!, userId: ID!): CartItem!
-        removeFromCart(id: ID!): Boolean!
-        clearCart(userId: ID!): Boolean!
+        addToCart(productId: ID!, quantity: Int!): CartItem! @auth(requires: USER)
+        removeFromCart(id: ID!): Boolean! @auth(requires: USER)
+        clearCart: Boolean! @auth(requires: USER)
     }
 `;

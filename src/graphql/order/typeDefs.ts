@@ -13,11 +13,11 @@ export const orderTypeDefs = `#graphql
     }
 
     type Query {
-        orders(userId: ID!): [Order!]!
+        orders: [Order!]!
         order(id: ID!): Order
     }
 
     type Mutation {
-        placeOrder(userId: ID!): Order!
+        placeOrder: Order! @auth(requires: USER)
     }
 `;

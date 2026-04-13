@@ -1,14 +1,22 @@
 import { ApolloServer } from "@apollo/server";
 import { expressMiddleware } from "@as-integrations/express5";
+import { makeExecutableSchema } from '@graphql-tools/schema';
 import { resolvers } from "./resolvers.ts";
 import { typeDefs } from "./typeDefs.ts";
 import { verifyAccessToken } from "../modules/user/utils/generateAuthTokens.ts";
 import type { AccessTokenContext } from "./context.type.ts";
+import { authDirective } from "./authDirective.ts";
 
 export const createApolloServer = async (): Promise<{ server: ApolloServer<AccessTokenContext>; middleware: ReturnType<typeof expressMiddleware> }> => {
-    const server = new ApolloServer<AccessTokenContext>({
+    let schema = makeExecutableSchema({
         typeDefs,
-        resolvers
+        resolvers,
+    });
+
+    schema = authDirective(schema);
+
+    const server = new ApolloServer<AccessTokenContext>({
+        schema
     });
 
     await server.start();

@@ -12,6 +12,6 @@ export const userTypeDefs = `#graphql
     }
 
     type Mutation {
-        createUser(name: String!, email: String!, password: String!): User!
+        createUser(name: String!, email: String!, password: String!): User! @auth(requires: ADMIN)
     }
 `;
