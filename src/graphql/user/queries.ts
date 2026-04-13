@@ -1,6 +1,8 @@
-import { addUser, findAllUsers, findUserById } from "../../modules/user/user.service.ts";
+import { UserService } from "../../modules/user/user.service.ts";
+
+const userService = new UserService();
 
 export const userQueries = {
-    users: async () => findAllUsers(),
-    user: async (_parent: undefined, args: { userId: string }) => findUserById(args.userId)
+    users: async () => userService.findAllUsers(),
+    user: async (_parent: undefined, args: { userId: string }) => userService.findUserById(args.userId)
 };

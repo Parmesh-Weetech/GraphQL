@@ -1,29 +1,43 @@
 import pool from "../../config/db.ts";
+import { CustomExceptionFactory } from "../../exception/custom-exception-factory.ts";
+import { ErrorCodes } from "../../exception/error-codes.ts";
+import type { User } from "./types/user.type.ts";
+import { UserRepository } from "./user.reporsitory.ts";
+import { createHashPassword } from "./utils/passwordHash.ts";
 
-export const addUser = async (name: string, email: string) => {
-    const existingUser = await pool.query(
-        'SELECT id FROM users WHERE email = $1',
-        [email]
-    );
+const userRepository = new UserRepository();
 
-    if (existingUser.rows.length > 0) {
-        throw new Error("Email already exists");
+export class UserService {
+    async createUser(name: string, email: string, password: string): Promise<User> {
+        const existingUser = await userRepository.findUserByEmail(email);
+
+        if (existingUser) {
+            throw CustomExceptionFactory.create(ErrorCodes.USER_EXISTS);
+        }
+
+        const hashedPassword = createHashPassword(password);
+
+        const user = userRepository.createUser(
+            name,
+            email,
+            hashedPassword.hashPassword,
+            hashedPassword.salt
+        );
+        return user;
     }
 
-    const { rows } = await pool.query(
-        'INSERT INTO users (name, email) VALUES ($1, $2) RETURNING *',
-        [name, email]
-    );
-    return rows[0];
-}
+    async findAllUsers(): Promise<User[]> {
+        const users = userRepository.findAllUsers();
+        return users;
+    }
 
-export const findAllUsers = async () => {
-    const { rows } = await pool.query('SELECT * FROM users');
-    return rows;
-}
+    async findUserById(id: string): Promise<User | null> {
+        const user = userRepository.findUserById(id);
+        return user;
+    }
 
-export const findUserById = async (id: string) => {
-    const { rows } = await pool.query('SELECT * FROM users WHERE id = $1', [id]);
-    return rows[0];
+    async findUserByEmail(email: string): Promise<User | null> {
+        const user = userRepository.findUserByEmail(email);
+        return user;
+    }
 }
-

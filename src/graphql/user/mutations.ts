@@ -1,5 +1,9 @@
-import { addUser } from "../../modules/user/user.service.ts";
+import { UserService } from "../../modules/user/user.service.ts";
+
+const userService = new UserService();
 
 export const userMutations = {
-    addUser: async (_parent: undefined, args: { name: string; email: string }) => addUser(args.name, args.email)
+    createUser: async (_parent: undefined, args: { name: string; email: string, password: string }) => {
+        return userService.createUser(args.name, args.email, args.password);
+    }
 };
