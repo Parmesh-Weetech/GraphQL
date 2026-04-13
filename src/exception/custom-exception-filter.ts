@@ -1,6 +1,6 @@
 import type { Request, Response } from 'express';
-import { CustomException } from './custom-exception.js';
-import { ErrorCodes } from './error-codes.js';
+import { CustomException } from './custom-exception.ts';
+import { ErrorCodes } from './error-codes.ts';
 
 interface ValidationError {
     field: string;

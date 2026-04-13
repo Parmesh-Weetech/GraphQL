@@ -1,6 +1,6 @@
-import { CustomException } from './custom-exception.js';
-import { defaultErrorMessages } from './default-error-message.js';
-import type { ErrorCodes } from './error-codes.js';
+import { CustomException } from './custom-exception.ts';
+import { defaultErrorMessages } from './default-error-message.ts';
+import type { ErrorCodes } from './error-codes.ts';
 
 export class CustomExceptionFactory {
     public static create(

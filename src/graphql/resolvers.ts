@@ -2,6 +2,7 @@ import { userResolvers } from "./user/index.ts";
 import { productResolvers } from "./product/index.ts";
 import { cartResolvers } from "./cart/index.ts";
 import { orderResolvers } from "./order/index.ts";
+import { authResolvers } from "./auth/resolvers.ts";
 
 export const resolvers = {
     Query: {
@@ -14,6 +15,7 @@ export const resolvers = {
         ...orderResolvers.Mutation,
         ...cartResolvers.Mutation,
         ...productResolvers.Mutation,
-        ...userResolvers.Mutation
+        ...userResolvers.Mutation,
+        ...authResolvers.Mutation
     }
 };

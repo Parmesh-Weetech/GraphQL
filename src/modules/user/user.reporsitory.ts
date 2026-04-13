@@ -1,8 +1,5 @@
 import type { User } from "./types/user.type.ts";
 import pool from "../../config/db.ts";
-import { CustomExceptionFactory } from "../../exception/custom-exception-factory.ts";
-import { ErrorCodes } from "../../exception/error-codes.ts";
-import { createHashPassword } from "./utils/passwordHash.ts";
 
 export class UserRepository {
     async createUser(name: string, email: string, password: string, salt: string): Promise<User> {
@@ -18,13 +15,14 @@ export class UserRepository {
             name: createdUser.name,
             email: createdUser.email,
             password: createdUser.password,
-            salt: createdUser.salt
+            salt: createdUser.salt,
+            userRole: 'USER'
         };
     }
 
     async findUserByEmail(email: string): Promise<User | null> {
         const result = await pool.query<User>(
-            'SELECT id, name, email, password, salt FROM users WHERE email = $1 LIMIT 1',
+            'SELECT id, name, email, password, salt, "userRole" FROM users WHERE email = $1 LIMIT 1',
             [email]
         );
 
@@ -39,7 +37,8 @@ export class UserRepository {
             name: user.name,
             email: user.email,
             password: user.password,
-            salt: user.salt
+            salt: user.salt,
+            userRole: user.userRole || 'USER'
         };
     }
 
@@ -60,7 +59,8 @@ export class UserRepository {
             name: user.name,
             email: user.email,
             password: user.password,
-            salt: user.salt
+            salt: user.salt,
+            userRole: user.userRole || 'USER'
         };
     }
 

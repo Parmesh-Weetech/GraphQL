@@ -1,4 +1,4 @@
-import type { ErrorCodes } from './error-codes.js';
+import type { ErrorCodes } from './error-codes.ts';
 
 export class CustomException extends Error {
     public readonly statusCode: number;
