@@ -6,7 +6,6 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   app.use(
-    '/graphql',
     rateLimit({
       windowMs: 5 * 60 * 1000, // 5 minutes
       max: 10, // 10 requests allowed
