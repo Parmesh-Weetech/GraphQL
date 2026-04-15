@@ -9,7 +9,7 @@ export class AddToCartInput {
 
   @Field()
   @IsNumber()
-  quantity: number;
+  quantity: string;
 }
 
 @InputType()
@@ -20,7 +20,7 @@ export class UpdateCartItemInput {
 
   @Field()
   @IsNumber()
-  quantity: number;
+  quantity: string;
 }
 
 @InputType()

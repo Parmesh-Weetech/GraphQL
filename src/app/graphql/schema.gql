@@ -2,6 +2,28 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+input AddToCartInput {
+  productId: ID!
+  quantity: String!
+}
+
+type Cart {
+  cartItems: [CartItem!]!
+  totalAmount: Float!
+  user: User!
+}
+
+type CartItem {
+  cart: Cart!
+  product: Product!
+  quantity: Int!
+  total: Float!
+}
+
+input CreateOrderInput {
+  userId: ID!
+}
+
 input CreateProductInput {
   name: String!
   price: String!
@@ -14,13 +36,47 @@ input CreateUserInput {
   userRole: String!
 }
 
+input FindOrdersByUserInput {
+  userId: ID!
+}
+
 type Mutation {
+  addToCart(input: AddToCartInput!, userId: ID!): Cart
+  clearCart(userId: ID!): Cart
+  createOrderFromCart(input: CreateOrderInput!): Order
   createProduct(input: CreateProductInput!): Product
   createUser(input: CreateUserInput!): User
   deleteProduct(id: ID!): Boolean!
   deleteUser(id: ID!): Boolean!
+  removeFromCart(cartItemId: ID!, userId: ID!): Cart
+  updateCartItem(input: UpdateCartItemInput!, userId: ID!): Cart
+  updateOrderStatus(input: UpdateOrderStatusInput!): Order
   updateProduct(id: ID!, input: UpdateProductInput!): Product
   updateUser(id: ID!, input: UpdateUserInput!): User
+}
+
+type Order {
+  orderItems: [OrderItem!]!
+  status: OrderStatus!
+  totalAmount: Float!
+  user: User!
+}
+
+type OrderItem {
+  order: Order!
+  product: Product!
+  quantity: Int!
+  total: Float!
+}
+
+enum OrderStatus {
+  CANCALLED
+  DELIVERED
+  FAIL
+  ORDERED
+  PAYMENT_PENDING
+  PENDING
+  SHIPPED
 }
 
 type Product {
@@ -29,10 +85,24 @@ type Product {
 }
 
 type Query {
+  findCartByUserId(userId: ID!): Cart
+  findOrderById(id: ID!): Order
+  findOrdersByUserId(input: FindOrdersByUserInput!): [Order!]!
   findProductById(id: ID!): Product
   findUserById(id: ID!): User
+  listOrders: [Order!]!
   listProducts: [Product!]!
   listUsers: [User!]!
+}
+
+input UpdateCartItemInput {
+  cartItemId: ID!
+  quantity: String!
+}
+
+input UpdateOrderStatusInput {
+  orderId: ID!
+  status: OrderStatus!
 }
 
 input UpdateProductInput {

@@ -1,4 +1,4 @@
-import { Field, ObjectType } from '@nestjs/graphql';
+import { Field, Float, ObjectType } from '@nestjs/graphql';
 import { ManyToOne, OneToMany, Column, Entity } from 'typeorm';
 import { BaseEntity } from '../common/entity/base.entity';
 import { User } from '../user/user.entity';
@@ -18,7 +18,7 @@ export class Cart extends BaseEntity {
   })
   cartItems: CartItem[];
 
-  @Field()
-  @Column({ default: 0 })
+  @Field(() => Float)
+  @Column({ type: 'numeric', default: 0 })
   totalAmount: number;
 }

@@ -14,6 +14,8 @@ export class CartService {
     private readonly cartRepository: Repository<Cart>,
     @InjectRepository(CartItem)
     private readonly cartItemRepository: Repository<CartItem>,
+    @InjectRepository(Product)
+    private readonly productRepository: Repository<Product>,
   ) {}
 
   async findCartByUserId(userId: string): Promise<Cart | null> {
@@ -30,10 +32,17 @@ export class CartService {
     return this.cartRepository.save(cart);
   }
 
-  async addToCart(userId: string, input: AddToCartInput): Promise<Cart> {
+  async addToCart(userId: string, input: AddToCartInput): Promise<Cart | null> {
     let cart = await this.findCartByUserId(userId);
     if (!cart) {
       cart = await this.createCart(userId);
+    }
+
+    const product = await this.productRepository.findOne({
+      where: { id: input.productId },
+    });
+    if (!product) {
+      return cart;
     }
 
     const existingItem = await this.cartItemRepository.findOne({
@@ -41,18 +50,20 @@ export class CartService {
     });
 
     if (existingItem) {
-      existingItem.quantity += input.quantity;
+      existingItem.quantity += Number(input.quantity);
+      existingItem.total = existingItem.quantity * product.price;
       await this.cartItemRepository.save(existingItem);
     } else {
       const cartItem = this.cartItemRepository.create({
         cart: { id: cart.id } as unknown as Cart,
-        product: { id: input.productId } as unknown as Product,
-        quantity: input.quantity,
+        product,
+        quantity: Number(input.quantity),
+        total: Number(input.quantity) * product.price,
       });
       await this.cartItemRepository.save(cartItem);
     }
 
-    return this.updateCartTotal(cart.id);
+    return await this.updateCartTotal(cart.id);
   }
 
   async updateCartItem(
@@ -64,10 +75,12 @@ export class CartService {
 
     const cartItem = await this.cartItemRepository.findOne({
       where: { id: input.cartItemId, cart: { id: cart.id } },
+      relations: ['product'],
     });
 
     if (cartItem) {
-      cartItem.quantity = input.quantity;
+      cartItem.quantity = Number(input.quantity);
+      cartItem.total = cartItem.quantity * cartItem.product.price;
       await this.cartItemRepository.save(cartItem);
       return this.updateCartTotal(cart.id);
     }

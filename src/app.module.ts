@@ -10,6 +10,12 @@ import { postgresConfig } from './app/config/pg.config';
 import { User } from './app/user/user.entity';
 import { ProductModule } from './app/product/product.module';
 import { Product } from './app/product/product.entity';
+import { Cart } from './app/cart/cart.entity';
+import { CartItem } from './app/cart/cart-item.entity';
+import { CartModule } from './app/cart/cart.module';
+import { OrderModule } from './app/order/order.module';
+import { Order } from './app/order/order.entity';
+import { OrderItem } from './app/order/order-item.entity';
 
 const envPath = path.resolve('.env');
 
@@ -25,12 +31,14 @@ const envPath = path.resolve('.env');
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
-        ...configService.get('postgresConfig')!,
-        entities: [User, Product],
+      ...configService.get('postgresConfig')!,
+        entities: [User, Product, Cart, CartItem, Order, OrderItem],
       }),
     }),
     UserModule,
-    ProductModule
+    ProductModule,
+    CartModule,
+    OrderModule
   ],
 })
 export class AppModule {}
