@@ -7,6 +7,11 @@ input AddToCartInput {
   quantity: String!
 }
 
+type AuthResponse {
+  accessToken: String!
+  refreshToken: String!
+}
+
 type Cart {
   cartItems: [CartItem!]!
   totalAmount: Float!
@@ -40,6 +45,11 @@ input FindOrdersByUserInput {
   userId: ID!
 }
 
+input LoginInput {
+  email: String!
+  password: String!
+}
+
 type Mutation {
   addToCart(input: AddToCartInput!, userId: ID!): Cart
   clearCart(userId: ID!): Cart
@@ -48,6 +58,7 @@ type Mutation {
   createUser(input: CreateUserInput!): User
   deleteProduct(id: ID!): Boolean!
   deleteUser(id: ID!): Boolean!
+  login(input: LoginInput!): AuthResponse!
   removeFromCart(cartItemId: ID!, userId: ID!): Cart
   updateCartItem(input: UpdateCartItemInput!, userId: ID!): Cart
   updateOrderStatus(input: UpdateOrderStatusInput!): Order

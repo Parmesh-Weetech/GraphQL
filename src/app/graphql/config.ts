@@ -8,4 +8,5 @@ export const graphqlConfig: ApolloDriverConfig = {
     graphiql: true,
     playground: false,
     debug: true,
+    context: ({ req, res }) => ({ req, res }),
 };

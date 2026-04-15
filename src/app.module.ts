@@ -16,6 +16,7 @@ import { CartModule } from './app/cart/cart.module';
 import { OrderModule } from './app/order/order.module';
 import { Order } from './app/order/order.entity';
 import { OrderItem } from './app/order/order-item.entity';
+import { AuthModule } from './app/auth/auth.module';
 
 const envPath = path.resolve('.env');
 
@@ -38,7 +39,8 @@ const envPath = path.resolve('.env');
     UserModule,
     ProductModule,
     CartModule,
-    OrderModule
+    OrderModule,
+    AuthModule
   ],
 })
 export class AppModule {}
