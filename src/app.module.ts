@@ -33,7 +33,6 @@ const envPath = path.resolve('.env');
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => {
         const env = configService.get<string>('NODE_ENV');
-        console.log('ENV VALUE:', env);
 
         return createGraphqlConfig(env ?? 'prod')
       }
