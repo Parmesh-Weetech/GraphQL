@@ -2,12 +2,14 @@ import { Module } from '@nestjs/common';
 import * as path from 'path';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriverConfig } from '@nestjs/apollo';
-import { UserModule } from './user/user.module';
-import { graphqlConfig } from './graphql/config';
+import { UserModule } from './app/user/user.module';
+import { graphqlConfig } from './app/graphql/config';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { postgresConfig } from './config/pg.config';
-import { User } from './user/user.entity';
+import { postgresConfig } from './app/config/pg.config';
+import { User } from './app/user/user.entity';
+import { ProductModule } from './app/product/product.module';
+import { Product } from './app/product/product.entity';
 
 const envPath = path.resolve('.env');
 
@@ -24,10 +26,11 @@ const envPath = path.resolve('.env');
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
         ...configService.get('postgresConfig')!,
-        entities: [User],
+        entities: [User, Product],
       }),
     }),
     UserModule,
+    ProductModule
   ],
 })
 export class AppModule {}

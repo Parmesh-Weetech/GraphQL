@@ -3,7 +3,7 @@ import * as path from 'path';
 
 export const graphqlConfig: ApolloDriverConfig = {
     driver: ApolloDriver,
-    autoSchemaFile: path.join(process.cwd(), 'src', 'graphql', 'schema.gql'),
+    autoSchemaFile: path.join(process.cwd(), 'src', 'app', 'graphql', 'schema.gql'),
     sortSchema: true,
     graphiql: true,
     playground: false,
