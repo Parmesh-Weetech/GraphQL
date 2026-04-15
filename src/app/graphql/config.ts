@@ -1,12 +1,13 @@
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import * as path from 'path';
 
-export const graphqlConfig: ApolloDriverConfig = {
+export const createGraphqlConfig = (isProd: string): ApolloDriverConfig => ({
     driver: ApolloDriver,
     autoSchemaFile: path.join(process.cwd(), 'src', 'app', 'graphql', 'schema.gql'),
     sortSchema: true,
-    graphiql: true,
     playground: false,
-    debug: true,
+    debug: isProd === 'dev' ? true : false,
+    introspection: isProd === 'dev' ? true : false,
     context: ({ req, res }) => ({ req, res }),
-};
+    graphiql: isProd === 'dev' ? true : false
+});
