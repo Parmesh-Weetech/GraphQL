@@ -1,27 +1,31 @@
-import { Prop, Schema } from "@nestjs/mongoose";
-import { BaseSchema } from "../common/entity/base.schema";
-import { Field, Float, ObjectType } from "@nestjs/graphql";
-import { UserDocument } from "../user/user.schema";
-import { Types } from "mongoose";
-import { OrderItemDocument } from "./order-item.schema";
-import { OrderStatus } from "./types/order-status.type";
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { HydratedDocument } from 'mongoose';
+import { Types } from 'mongoose';
+import { OrderStatus } from './types/order-status.type';
+import { Field, Float, ObjectType } from '@nestjs/graphql';
+import { BaseSchema } from '../common/entity/base.schema';
+import { UserDocument } from '../user/user.schema';
+import { OrderItemDocument } from './order-item.schema';
 
 @ObjectType()
-@Schema({ collection: 'orders' })
+@Schema({ collection: 'orders', timestamps: true })
 export class OrderDocument extends BaseSchema {
-    @Field(() => UserDocument)
-    @Prop({ required: true, type: Types.ObjectId, ref: 'User' })
-    user: Types.ObjectId;
+  @Field(() => UserDocument)
+  @Prop({ type: Types.ObjectId, ref: 'User', required: true })
+  user: Types.ObjectId;
 
-    @Field(() => [OrderItemDocument])
-    @Prop({ type: [{ type: Types.ObjectId, ref: 'OrderItem' }], default: [] })
-    orderItems: Types.ObjectId[];
+  @Field(() => [OrderItemDocument])
+  @Prop({ type: [{ type: Types.ObjectId, ref: 'OrderItem' }], default: [] })
+  orderItems: Types.ObjectId[];
 
-    @Field(() => Float)
-    @Prop({ type: 'numeric', default: 0 })
-    totalAmount: number;
+  @Field(() => Float)
+  @Prop({ type: 'number', default: 0 })
+  totalAmount: number;
 
-    @Field(() => OrderStatus)
-    @Prop({ type: 'enum', enum: OrderStatus, default: OrderStatus.PENDING, required: false })
-    status: OrderStatus;
+  @Field()
+  @Prop({ type: String, enum: OrderStatus, default: OrderStatus.PENDING })
+  status: OrderStatus;
 }
+
+export const OrderSchema = SchemaFactory.createForClass(OrderDocument);
+export type OrderDocumentType = HydratedDocument<OrderDocument>;

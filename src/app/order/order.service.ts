@@ -1,6 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Inject, forwardRef } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DataSource, Repository } from 'typeorm';
+import { DataSource } from 'typeorm';
+import { Repository } from 'typeorm';
 import { Cart } from '../cart/cart.entity';
 import { CartItem } from '../cart/cart-item.entity';
 import { CustomExceptionFactory } from '../common/exception/custom-exception-factory';
@@ -8,44 +9,59 @@ import { ErrorCodes } from '../common/exception/error-codes';
 import { Order } from './order.entity';
 import { OrderItem } from './order-item.entity';
 import { OrderStatus } from './types/order-status.type';
+import { IOrderRepository } from './interfaces/order-repository.interface';
+import { OrderRepositoryPostgres } from './repositories/order-repository.postgres';
+import { OrderRepositoryMongo } from './repositories/order-repository.mongo';
+import { DbProvider } from '../common/enums/db-provider.enum';
 
 @Injectable()
 export class OrderService {
   constructor(
+    @Inject(forwardRef(() => OrderRepositoryPostgres))
+    private readonly orderRepositoryPostgres: OrderRepositoryPostgres,
+    @Inject(forwardRef(() => OrderRepositoryMongo))
+    private readonly orderRepositoryMongo: OrderRepositoryMongo,
     private readonly dataSource: DataSource,
     @InjectRepository(Order)
-    private readonly orderRepository: Repository<Order>
+    private readonly orderRepository: Repository<Order>,
+    @InjectRepository(OrderItem)
+    private readonly orderItemRepository: Repository<OrderItem>,
+    @InjectRepository(Cart)
+    private readonly cartRepository: Repository<Cart>,
+    @InjectRepository(CartItem)
+    private readonly cartItemRepository: Repository<CartItem>,
   ) {}
 
-  async findAll(): Promise<Order[] | []> {
-    const orders = await this.orderRepository.find({
-      relations: ['orderItems', 'orderItems.product', 'user'],
-      order: { createdAt: 'DESC' },
-    });
-
-    return orders.length > 0 ? orders : [];
+  private getRepository(dbProvider?: DbProvider): IOrderRepository {
+    const provider = dbProvider ?? DbProvider.POSTGRES;
+    return provider === DbProvider.MONGODB
+      ? this.orderRepositoryMongo
+      : this.orderRepositoryPostgres;
   }
 
-  async findOne(id: string): Promise<Order | null> {
-    const order = await this.orderRepository.findOne({
-      where: { id },
-      relations: ['orderItems', 'orderItems.product', 'user'],
-    });
-
-    return order ?? null;
+  async findAll(dbProvider?: DbProvider): Promise<any> {
+    return this.getRepository(dbProvider).findOrdersByUserId('');
   }
 
-  async findOrdersByUserId(userId: string): Promise<Order[] | []> {
-    const orders = await this.orderRepository.find({
-      where: { user: { id: userId } },
-      relations: ['orderItems', 'orderItems.product'],
-      order: { createdAt: 'DESC' },
-    });
-
-    return orders.length > 0 ? orders : [];
+  async findOne(id: string, dbProvider?: DbProvider): Promise<any> {
+    return this.getRepository(dbProvider).findOrderById(id);
   }
 
-  async createOrderFromCart(userId: string): Promise<Order | null> {
+  async findOrdersByUserId(
+    userId: string,
+    dbProvider?: DbProvider,
+  ): Promise<any> {
+    return this.getRepository(dbProvider).findOrdersByUserId(userId);
+  }
+
+  async createOrderFromCart(
+    userId: string,
+    dbProvider?: DbProvider,
+  ): Promise<any> {
+    if (dbProvider === DbProvider.MONGODB) {
+      throw CustomExceptionFactory.create(ErrorCodes.INTERNAL_SERVER_ERROR);
+    }
+
     return this.dataSource.transaction(async (manager) => {
       const cartRepository = manager.getRepository(Cart);
       const cartItemRepository = manager.getRepository(CartItem);
@@ -94,19 +110,19 @@ export class OrderService {
     });
   }
 
-  async updateStatus(id: string, status: OrderStatus): Promise<Order | null> {
+  async updateStatus(
+    id: string,
+    status: OrderStatus,
+    dbProvider?: DbProvider,
+  ): Promise<any> {
     if (!Object.values(OrderStatus).includes(status)) {
       throw CustomExceptionFactory.create(ErrorCodes.ORDER_STATUS_INVALID);
     }
 
-    const order = await this.findOne(id);
-    if (!order) {
-      throw CustomExceptionFactory.create(ErrorCodes.ORDER_NOT_FOUND);
-    }
+    return this.getRepository(dbProvider).updateOrderStatus(id, status);
+  }
 
-    order.status = status;
-    await this.orderRepository.save(order);
-
-    return this.findOne(id);
+  async cancelOrder(id: string, dbProvider?: DbProvider): Promise<any> {
+    return this.getRepository(dbProvider).cancelOrder(id);
   }
 }
