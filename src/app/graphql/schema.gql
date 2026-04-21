@@ -164,3 +164,15 @@ type User {
   updatedAt: DateTime!
   userRole: String!
 }
+
+type UserDocument {
+  createdAt: DateTime
+  deletedAt: DateTime
+  email: String!
+  id: ID!
+  name: String!
+  password: String!
+  salt: String!
+  updatedAt: DateTime
+  userRole: String!
+}

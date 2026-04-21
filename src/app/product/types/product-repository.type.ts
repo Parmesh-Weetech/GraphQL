@@ -1,4 +1,4 @@
 import { Product } from "../product.entity";
-import { Product as ProductMongoose } from '../product.schema'
+import { ProductDocument } from '../product.schema'
 
-export type ProductType = Product | ProductMongoose
+export type ProductType = Product | ProductDocument;

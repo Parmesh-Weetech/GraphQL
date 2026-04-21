@@ -7,7 +7,7 @@ import { BaseSchema } from '../common/entity/base.schema';
 
 @ObjectType()
 @Schema({ collection: 'carts' })
-export class Cart extends BaseSchema {
+export class CartDocument extends BaseSchema {
     @Field(() => UserDocument)
     @Prop({ type: Types.ObjectId, ref: 'User', required: true })
     user: Types.ObjectId;
@@ -21,5 +21,5 @@ export class Cart extends BaseSchema {
     totalAmount: number;
 }
 
-export const CartSchema = SchemaFactory.createForClass(Cart);
-export type CartDocument = HydratedDocument<Cart>;
+export const CartSchema = SchemaFactory.createForClass(CartDocument);
+export type CartDocumentType = HydratedDocument<CartDocument>;

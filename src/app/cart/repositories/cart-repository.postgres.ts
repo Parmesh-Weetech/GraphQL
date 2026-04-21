@@ -20,21 +20,21 @@ export class CartRepositoryPostgres implements ICartRepository {
         private readonly productRepository: Repository<Product>,
     ) { }
 
-    async findCartByUserId(userId: string): Promise<any | null> {
+    async findCartByUserId(userId: string): Promise<CartType | null> {
         return await this.cartRepository.findOne({
             where: { user: { id: userId } },
             relations: ['cartItems', 'cartItems.product'],
         });
     }
 
-    async createCart(userId: string): Promise<any | null> {
+    async createCart(userId: string): Promise<CartType | null> {
         const cart = this.cartRepository.create({
             user: { id: userId } as unknown as User,
         });
         return this.cartRepository.save(cart);
     }
 
-    async addToCart(userId: string, input: AddToCartInput): Promise<any | null> {
+    async addToCart(userId: string, input: AddToCartInput): Promise<CartType | null> {
         let cart = await this.findCartByUserId(userId);
         if (!cart) {
             cart = await this.createCart(userId);
@@ -78,7 +78,7 @@ export class CartRepositoryPostgres implements ICartRepository {
     async updateCartItem(
         userId: string,
         input: UpdateCartItemInput,
-    ): Promise<any | null> {
+    ): Promise<CartType | null> {
         const cart = await this.findCartByUserId(userId);
         if (!cart) return null;
 
@@ -99,7 +99,7 @@ export class CartRepositoryPostgres implements ICartRepository {
     async removeFromCart(
         userId: string,
         cartItemId: string,
-    ): Promise<any | null> {
+    ): Promise<CartType | null> {
         const cart = await this.findCartByUserId(userId);
         if (!cart) return null;
 
@@ -107,16 +107,19 @@ export class CartRepositoryPostgres implements ICartRepository {
         return this.updateCartTotal(cart.id as string);
     }
 
-    async clearCart(userId: string): Promise<any | null> {
+    async clearCart(userId: string): Promise<CartType | null> {
         const cart = await this.findCartByUserId(userId);
         if (!cart) return null;
 
         await this.cartItemRepository.delete({ cart: { id: cart.id as string } });
-        cart.totalAmount = 0;
-        return this.cartRepository.save(cart);
+        await this.cartRepository.update(cart.id, {
+            totalAmount: 0
+        })
+
+        return await this.findCartByUserId(userId)
     }
 
-    async updateCartTotal(cartId: string): Promise<any | null> {
+    async updateCartTotal(cartId: string): Promise<CartType | null> {
         const cart = await this.cartRepository.findOne({
             where: { id: cartId },
             relations: ['cartItems', 'cartItems.product'],

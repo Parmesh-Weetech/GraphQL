@@ -1,4 +1,4 @@
 import { Cart } from "../cart.entity";
-import { Cart as CartMongoose } from '../cart.schema'
+import { CartDocument } from '../cart.schema'
 
-export type CartType = Cart | CartMongoose;
+export type CartType = Cart | CartDocument;

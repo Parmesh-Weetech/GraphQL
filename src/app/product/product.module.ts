@@ -6,7 +6,7 @@ import { Product } from './product.entity';
 import { ProductRepositoryMongo } from './repositories/product-repository.mongo';
 import { ProductRepositoryPostgres } from './repositories/product-repository.postgres';
 import { MongooseModule } from '@nestjs/mongoose';
-import { Product as ProductModel, ProductSchema } from './product.schema'
+import { ProductDocument, ProductSchema } from './product.schema'
 
 @Module({
   providers: [
@@ -18,7 +18,7 @@ import { Product as ProductModel, ProductSchema } from './product.schema'
   imports: [
     TypeOrmModule.forFeature([Product]),
     MongooseModule.forFeature([{
-      name: ProductModel.name,
+      name: ProductDocument.name,
       schema: ProductSchema
     }])
   ]

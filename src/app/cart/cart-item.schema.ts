@@ -1,12 +1,10 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
 import { Types } from 'mongoose';
+import { BaseSchema } from '../common/entity/base.schema';
 
-@Schema({ collection: 'cart_items', timestamps: true })
-export class CartItemDocument {
-  @Prop({ type: 'string' })
-  id: string;
-
+@Schema({ collection: 'cart_items' })
+export class CartItemDocument extends BaseSchema {
   @Prop({ type: Types.ObjectId, ref: 'Product', required: true })
   product: Types.ObjectId;
 
@@ -15,15 +13,6 @@ export class CartItemDocument {
 
   @Prop({ type: 'number', default: 0 })
   total: number;
-
-  @Prop({ type: 'date' })
-  createdAt: Date;
-
-  @Prop({ type: 'date' })
-  updatedAt: Date;
-
-  @Prop({ type: 'date' })
-  deletedAt: Date;
 }
 
 export const CartItemSchema = SchemaFactory.createForClass(CartItemDocument);

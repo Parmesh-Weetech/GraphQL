@@ -6,7 +6,7 @@ import { BaseSchema } from '../common/entity/base.schema';
 
 @ObjectType()
 @Schema({ collection: 'products', timestamps: true })
-export class Product extends BaseSchema {
+export class ProductDocument extends BaseSchema {
   @Field()
   @Prop({ required: true })
   name: string;
@@ -16,5 +16,5 @@ export class Product extends BaseSchema {
   price: number;
 }
 
-export const ProductSchema = SchemaFactory.createForClass(Product);
-export type ProductDocument = HydratedDocument<Product>;
+export const ProductSchema = SchemaFactory.createForClass(ProductDocument);
+export type ProductDocumentType = HydratedDocument<ProductDocument>;

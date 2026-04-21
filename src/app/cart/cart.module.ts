@@ -8,7 +8,7 @@ import { CartItem } from './cart-item.entity';
 import { Product } from '../product/product.entity';
 import { CartRepositoryPostgres } from './repositories/cart-repository.postgres';
 import { CartRepositoryMongo } from './repositories/cart-repository.mongo';
-import { Cart as CartDocument, CartSchema } from './cart.schema';
+import { CartDocument, CartSchema } from './cart.schema';
 import { CartItemDocument, CartItemSchema } from './cart-item.schema';
 
 @Module({

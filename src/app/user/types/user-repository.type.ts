@@ -1,4 +1,4 @@
 import { User } from "../user.entity";
-import { UserDocument as UserMongoose } from '../user.schema';
+import { UserDocument } from '../user.schema';
 
-export type UserType = User | UserMongoose;
+export type UserType = User | UserDocument;

@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { ICartRepository } from '../interfaces/cart-repository.interface';
-import { Cart as CartMongoose, CartDocument } from '../cart.schema';
+import { CartDocument } from '../cart.schema';
 import {
     CartItemDocument,
 } from '../cart-item.schema';
@@ -11,7 +11,7 @@ import { AddToCartInput, UpdateCartItemInput } from '../cart.input';
 @Injectable()
 export class CartRepositoryMongo implements ICartRepository {
     constructor(
-        @InjectModel(CartMongoose.name)
+        @InjectModel(CartDocument.name)
         private readonly cartModel: Model<CartDocument>,
         @InjectModel(CartItemDocument.name)
         private readonly cartItemModel: Model<CartItemDocument>,
@@ -50,7 +50,7 @@ export class CartRepositoryMongo implements ICartRepository {
     async addToCart(
         userId: string,
         input: AddToCartInput,
-    ): Promise<CartMongoose | null> {
+    ): Promise<CartDocument | null> {
         let cart = await this.findCartByUserId(userId);
         if (!cart) {
             cart = await this.createCart(userId);
@@ -93,7 +93,7 @@ export class CartRepositoryMongo implements ICartRepository {
     async updateCartItem(
         userId: string,
         input: UpdateCartItemInput,
-    ): Promise<CartMongoose | null> {
+    ): Promise<CartDocument | null> {
         const cart = await this.findCartByUserId(userId);
         if (!cart) return null;
 
@@ -115,7 +115,7 @@ export class CartRepositoryMongo implements ICartRepository {
     async removeFromCart(
         userId: string,
         cartItemId: string,
-    ): Promise<CartMongoose | null> {
+    ): Promise<CartDocument | null> {
         const cart = await this.findCartByUserId(userId);
         if (!cart) return null;
 
@@ -128,7 +128,7 @@ export class CartRepositoryMongo implements ICartRepository {
         return this.updateCartTotal(cart.id.toString());
     }
 
-    async clearCart(userId: string): Promise<CartMongoose | null> {
+    async clearCart(userId: string): Promise<CartDocument | null> {
         const cart = await this.findCartByUserId(userId);
         if (!cart) return null;
 
@@ -146,7 +146,7 @@ export class CartRepositoryMongo implements ICartRepository {
         return this.findCartByUserId(userId);
     }
 
-    async updateCartTotal(cartId: string): Promise<CartMongoose | null> {
+    async updateCartTotal(cartId: string): Promise<CartDocument | null> {
         const cart = await this.cartModel.findById(cartId).exec();
         if (!cart) return null;
 
