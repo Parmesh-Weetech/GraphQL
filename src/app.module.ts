@@ -5,6 +5,7 @@ import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { UserModule } from './app/user/user.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { MongooseModule } from '@nestjs/mongoose';
 import { postgresConfig } from './app/config/pg.config';
 import { User } from './app/user/user.entity';
 import { ProductModule } from './app/product/product.module';
@@ -22,11 +23,14 @@ const envPath = path.resolve('.env');
 
 @Module({
   imports: [
+    // Setting up ConfigModule
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: envPath,
       load: [postgresConfig],
     }),
+
+    // Setting up GraphQL with nestjs
     GraphQLModule.forRootAsync<ApolloDriverConfig>({
       driver: ApolloDriver,
       imports: [ConfigModule],
@@ -37,13 +41,30 @@ const envPath = path.resolve('.env');
         return createGraphqlConfig(env ?? 'prod')
       }
     }),
+
+    // Setting up PostgreSQL with TypeORM
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
-      ...configService.get('postgresConfig')!,
+        ...configService.get('postgresConfig')!,
         entities: [User, Product, Cart, CartItem, Order, OrderItem],
       }),
+    }),
+
+    // Setting up MongoDB
+    MongooseModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => {
+        const uri = configService.get<string>('MONGO_URL');
+        const dbName = configService.get<string>('DB_NAME');
+
+        return {
+          uri,
+          ...(dbName ? { dbName } : {})
+        };
+      }
     }),
     UserModule,
     ProductModule,
@@ -52,4 +73,4 @@ const envPath = path.resolve('.env');
     AuthModule
   ],
 })
-export class AppModule {}
+export class AppModule { }

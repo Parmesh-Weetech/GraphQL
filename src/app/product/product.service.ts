@@ -1,69 +1,68 @@
-import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Product } from './product.entity';
-import { Repository } from 'typeorm';
+import { Injectable, Inject, forwardRef } from '@nestjs/common';
 import { CreateProductInput, UpdateProductInput } from './product.input';
+import { IProductRepository } from './interfaces/product-repository.interface';
+import { ProductRepositoryPostgres } from './repositories/product-repository.postgres';
+import { ProductRepositoryMongo } from './repositories/product-repository.mongo';
+import { DbProvider } from '../common/enums/db-provider.enum';
 import { CustomExceptionFactory } from '../common/exception/custom-exception-factory';
 import { ErrorCodes } from '../common/exception/error-codes';
 
 @Injectable()
 export class ProductService {
     constructor(
-        @InjectRepository(Product)
-        private readonly productRepository: Repository<Product>
+        @Inject(forwardRef(() => ProductRepositoryPostgres))
+        private readonly productRepositoryPostgres: ProductRepositoryPostgres,
+        @Inject(forwardRef(() => ProductRepositoryMongo))
+        private readonly productRepositoryMongo: ProductRepositoryMongo,
     ) { }
 
-    async create(createProductReq: CreateProductInput): Promise<Product | null> {
-        const product = await this.productRepository.save(
-            this.productRepository.create({
-                name: createProductReq.name,
-                price: Number(createProductReq.price)
-            })
-        );
+    private getRepository(dbProvider?: DbProvider): IProductRepository {
+        const provider = dbProvider ?? DbProvider.POSTGRES;
+        return provider === DbProvider.MONGODB
+            ? this.productRepositoryMongo
+            : this.productRepositoryPostgres;
+    }
 
+    async create(
+        createProductReq: CreateProductInput,
+        dbProvider?: DbProvider,
+    ): Promise<any> {
+        const product =
+            await this.getRepository(dbProvider).create(createProductReq);
         return product ?? null;
     }
 
-    async findOne(id: string): Promise<Product | null> {
-        const product = await this.productRepository.findOne({ where: { id } });
-
-        return product ?? null;
+    async findOne(id: string, dbProvider?: DbProvider): Promise<any> {
+        return this.getRepository(dbProvider).findOne(id);
     }
 
-    async findAll(): Promise<Product[] | []> {
-        const products = await this.productRepository.find();
-
-        return products.length > 0 ? products : [];
+    async findAll(dbProvider?: DbProvider): Promise<any[]> {
+        return this.getRepository(dbProvider).findAll();
     }
 
-    async update(id: string, updateProductReq: UpdateProductInput): Promise<Product | null> {
-        const product = this.findOne(id);
+    async update(
+        id: string,
+        updateProductReq: UpdateProductInput,
+        dbProvider?: DbProvider,
+    ): Promise<any> {
+        const product = await this.getRepository(dbProvider).findOne(id);
 
-        const affectedRows = await this.productRepository.update(
-            id, {
-                name: updateProductReq.name,
-                price: Number(updateProductReq.price)
-            }
-        );
-
-        if(affectedRows.affected === null || affectedRows.affected === undefined || affectedRows.affected === 0) {
-            throw CustomExceptionFactory.create(
-                ErrorCodes.INTERNAL_SERVER_ERROR
-            );
+        if (!product) {
+            throw CustomExceptionFactory.create(ErrorCodes.PRODUCT_NOT_FOUND);
         }
 
-        return await this.findOne(id);
+        return this.getRepository(dbProvider).update(id, updateProductReq);
     }
 
-    async remove(id: string) {
-        const affectedRows = await this.productRepository.delete(id);
+    async remove(id: string, dbProvider?: DbProvider): Promise<Boolean> {
+        await this.findOne(id);
 
-        if (affectedRows.affected === null || affectedRows.affected === undefined || affectedRows.affected === 0) {
-            throw CustomExceptionFactory.create(
-                ErrorCodes.INTERNAL_SERVER_ERROR
-            );
+        const result = await this.getRepository(dbProvider).remove(id);
+
+        if (!result) {
+            throw CustomExceptionFactory.create(ErrorCodes.INTERNAL_SERVER_ERROR);
         }
 
-        return affectedRows.affected > 0;
+        return result;
     }
 }

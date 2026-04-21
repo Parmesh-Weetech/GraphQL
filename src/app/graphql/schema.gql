@@ -64,19 +64,19 @@ input LoginInput {
 }
 
 type Mutation {
-  addToCart(input: AddToCartInput!, userId: ID!): Cart
-  clearCart(userId: ID!): Cart
+  addToCart(dbProvider: String, input: AddToCartInput!, userId: ID!): Cart
+  clearCart(dbProvider: String, userId: ID!): Cart
   createOrderFromCart(input: CreateOrderInput!): Order
-  createProduct(input: CreateProductInput!): Product
-  createUser(input: CreateUserInput!): User
-  deleteProduct(id: ID!): Boolean!
-  deleteUser(id: ID!): Boolean!
+  createProduct(dbProvider: String, input: CreateProductInput!): Product
+  createUser(dbProvider: String, input: CreateUserInput!): User
+  deleteProduct(dbProvider: String, id: ID!): Boolean!
+  deleteUser(dbProvider: String, id: ID!): Boolean!
   login(input: LoginInput!): AuthResponse!
-  removeFromCart(cartItemId: ID!, userId: ID!): Cart
-  updateCartItem(input: UpdateCartItemInput!, userId: ID!): Cart
+  removeFromCart(cartItemId: ID!, dbProvider: String, userId: ID!): Cart
+  updateCartItem(dbProvider: String, input: UpdateCartItemInput!, userId: ID!): Cart
   updateOrderStatus(input: UpdateOrderStatusInput!): Order
-  updateProduct(id: ID!, input: UpdateProductInput!): Product
-  updateUser(id: ID!, input: UpdateUserInput!): User
+  updateProduct(dbProvider: String, id: ID!, input: UpdateProductInput!): Product
+  updateUser(dbProvider: String, id: ID!, input: UpdateUserInput!): User
 }
 
 type Order {
@@ -121,14 +121,14 @@ type Product {
 }
 
 type Query {
-  findCartByUserId(userId: ID!): Cart
+  findCartByUserId(dbProvider: String, userId: ID!): Cart
   findOrderById(id: ID!): Order
   findOrdersByUserId(input: FindOrdersByUserInput!): [Order!]!
-  findProductById(id: ID!): Product
-  findUserById(id: ID!): User
+  findProductById(dbProvider: String, id: ID!): Product
+  findUserById(dbProvider: String, id: ID!): User
   listOrders: [Order!]!
-  listProducts: [Product!]!
-  listUsers: [User!]!
+  listProducts(dbProvider: String): [Product!]!
+  listUsers(dbProvider: String): [User!]!
 }
 
 input UpdateCartItemInput {

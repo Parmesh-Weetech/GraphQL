@@ -6,6 +6,7 @@ import { AddToCartInput, UpdateCartItemInput } from './cart.input';
 import { AuthGuard } from '../auth/guards/auth.guard';
 import { CustomExceptionFactory } from '../common/exception/custom-exception-factory';
 import { ErrorCodes } from '../common/exception/error-codes';
+import { DbProvider } from '../common/enums/db-provider.enum';
 
 @UseGuards(AuthGuard)
 @Resolver(() => Cart)
@@ -14,8 +15,9 @@ export class CartResolver {
 
     @Query(() => Cart, { nullable: true })
     async findCartByUserId(
-      @Args('userId', { type: () => ID }) userId: string,
-      @Context() context: any,
+        @Args('userId', { type: () => ID }) userId: string,
+        @Args('dbProvider', { nullable: true }) dbProvider: DbProvider,
+        @Context() context: any,
     ) {
         const currentUserId = context.req.user.userId;
 
@@ -23,13 +25,14 @@ export class CartResolver {
             throw CustomExceptionFactory.create(ErrorCodes.FORBIDDEN);
         }
 
-        return this.cartService.findCartByUserId(currentUserId);
+        return this.cartService.findCartByUserId(currentUserId, dbProvider);
     }
 
     @Mutation(() => Cart, { nullable: true })
     async addToCart(
         @Args('userId', { type: () => ID }) userId: string,
         @Args('input') input: AddToCartInput,
+        @Args('dbProvider', { nullable: true }) dbProvider: DbProvider,
         @Context() context: any,
     ) {
         const currentUserId = context.req.user.userId;
@@ -38,13 +41,14 @@ export class CartResolver {
             throw CustomExceptionFactory.create(ErrorCodes.FORBIDDEN);
         }
 
-        return this.cartService.addToCart(currentUserId, input);
+        return this.cartService.addToCart(currentUserId, input, dbProvider);
     }
 
     @Mutation(() => Cart, { nullable: true })
     async updateCartItem(
         @Args('userId', { type: () => ID }) userId: string,
         @Args('input') input: UpdateCartItemInput,
+        @Args('dbProvider', { nullable: true }) dbProvider: DbProvider,
         @Context() context: any,
     ) {
         const currentUserId = context.req.user.userId;
@@ -53,13 +57,14 @@ export class CartResolver {
             throw CustomExceptionFactory.create(ErrorCodes.FORBIDDEN);
         }
 
-        return this.cartService.updateCartItem(currentUserId, input);
+        return this.cartService.updateCartItem(currentUserId, input, dbProvider);
     }
 
     @Mutation(() => Cart, { nullable: true })
     async removeFromCart(
         @Args('userId', { type: () => ID }) userId: string,
         @Args('cartItemId', { type: () => ID }) cartItemId: string,
+        @Args('dbProvider', { nullable: true }) dbProvider: DbProvider,
         @Context() context: any,
     ) {
         const currentUserId = context.req.user.userId;
@@ -68,12 +73,17 @@ export class CartResolver {
             throw CustomExceptionFactory.create(ErrorCodes.FORBIDDEN);
         }
 
-        return this.cartService.removeFromCart(currentUserId, cartItemId);
+        return this.cartService.removeFromCart(
+            currentUserId,
+            cartItemId,
+            dbProvider,
+        );
     }
 
     @Mutation(() => Cart, { nullable: true })
     async clearCart(
         @Args('userId', { type: () => ID }) userId: string,
+        @Args('dbProvider', { nullable: true }) dbProvider: DbProvider,
         @Context() context: any,
     ) {
         const currentUserId = context.req.user.userId;
@@ -82,6 +92,6 @@ export class CartResolver {
             throw CustomExceptionFactory.create(ErrorCodes.FORBIDDEN);
         }
 
-        return this.cartService.clearCart(currentUserId);
+        return this.cartService.clearCart(currentUserId, dbProvider);
     }
 }

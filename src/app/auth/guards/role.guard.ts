@@ -4,11 +4,11 @@ import { GqlExecutionContext } from '@nestjs/graphql';
 import { CustomExceptionFactory } from '../../common/exception/custom-exception-factory';
 import { ErrorCodes } from '../../common/exception/error-codes';
 import { UserRole } from '../../user/types/user-role.type';
-import { ROLES_KEY } from '../roles.decorator';
+import { ROLES_KEY } from '../decorators/roles.decorator';
 
 @Injectable()
 export class RoleGuard implements CanActivate {
-  constructor(private readonly reflector: Reflector) {}
+  constructor(private readonly reflector: Reflector) { }
 
   canActivate(context: ExecutionContext): boolean {
     const requiredRoles = this.reflector.getAllAndOverride<UserRole[]>(
